@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 type OrderItem = {
   productId: string;
@@ -43,7 +44,7 @@ type OrderApiResponse = {
 };
 
 
-export default function OrderConfirmationPage() {
+function OrderConfirmationContent() {
 
   const searchParams = useSearchParams();
 
@@ -92,7 +93,7 @@ export default function OrderConfirmationPage() {
         // ---------------------------------------------------
 
         const response = await fetch(
-          `http://127.0.0.1:8000/orders/${encodeURIComponent(orderId)}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/orders/${encodeURIComponent(orderId)}`,
           {
             method: "GET",
             headers: {
@@ -627,5 +628,21 @@ export default function OrderConfirmationPage() {
 
     </main>
 
+    );
+}
+
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-[#faf7f2] px-6">
+          <p className="text-sm text-gray-500">
+            Loading order...
+          </p>
+        </main>
+      }
+    >
+      <OrderConfirmationContent />
+    </Suspense>
   );
 }

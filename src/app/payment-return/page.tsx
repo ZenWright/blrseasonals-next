@@ -29,7 +29,7 @@ const retryPayment = async () => {
     setMessage("Preparing your payment...");
 
     const response = await fetch(
-      "http://127.0.0.1:8000/payments/create",
+      `${process.env.NEXT_PUBLIC_API_URL}/payments/create`,
       {
         method: "POST",
         headers: {
@@ -94,7 +94,6 @@ const retryPayment = async () => {
     );
   }
 };
-
   useEffect(() => {
     const verifyPayment = async () => {
       try {
@@ -136,7 +135,7 @@ const retryPayment = async () => {
         // ---------------------------------------------------------
 
         const response = await fetch(
-          "http://127.0.0.1:8000/payments/verify",
+          `${process.env.NEXT_PUBLIC_API_URL}/payments/verify`,
           {
             method: "POST",
             headers: {
@@ -331,31 +330,20 @@ const retryPayment = async () => {
           )}
 
           <div className="mt-8 flex flex-col gap-3">
-  {(status === "pending" ||
-    status === "failed") && (
-    <button
-      type="button"
-      onClick={retryPayment}
-      className="rounded-xl bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
-    >
-      Try Payment Again
-    </button>
-  )}
+            <Link
+              href="/checkout"
+              className="rounded-xl bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+            >
+              Return to Checkout
+            </Link>
 
-  <Link
-    href="/checkout"
-    className="rounded-xl border border-black/10 px-6 py-3 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
-  >
-    Return to Checkout
-  </Link>
-
-  <Link
-    href="/products"
-    className="rounded-xl border border-black/10 px-6 py-3 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
-  >
-    Continue Shopping
-  </Link>
-</div>
+            <Link
+              href="/products"
+              className="rounded-xl border border-black/10 px-6 py-3 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
+            >
+              Continue Shopping
+            </Link>
+          </div>
         </div>
       </div>
     </main>

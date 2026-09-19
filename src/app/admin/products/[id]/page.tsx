@@ -190,23 +190,26 @@ const [
   seasonalCollectionsResponse,
   productSeasonalResponse,
 ] = await Promise.all([
-  fetch(`http://127.0.0.1:8000/products/${productId}`, {
+  fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
     cache: "no-store",
   }),
-  fetch("http://127.0.0.1:8000/categories", {
+
+  fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
     cache: "no-store",
   }),
-  fetch("http://127.0.0.1:8000/admin/seasonal-collections", {
+
+  fetch(`${process.env.NEXT_PUBLIC_API_URL}/seasonal-collections`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
     cache: "no-store",
   }),
+
   fetch(
-    `http://127.0.0.1:8000/admin/products/${productId}/seasonal-collections`,
+    `${process.env.NEXT_PUBLIC_API_URL}/admin/products/${productId}/seasonal-collections`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -215,7 +218,6 @@ const [
     }
   ),
 ]);
-
 if (!productResponse.ok) {
   throw new Error("Failed to load product.");
 }
@@ -384,7 +386,7 @@ const token = await user.getIdToken(true);
 
 const response = await fetch(
 
-`http://127.0.0.1:8000/admin/products/${productId}/images`,
+`${process.env.NEXT_PUBLIC_API_URL}/admin/products/${productId}/images`,
 
 {
 
@@ -562,7 +564,7 @@ async function handleSaveSeasonalCollections() {
     const token = await user.getIdToken(true);
 
     const response = await fetch(
-      `http://127.0.0.1:8000/admin/products/${productId}/seasonal-collections`,
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/products/${productId}/seasonal-collections`,
       {
         method: "PUT",
         headers: {
@@ -633,7 +635,7 @@ const token = await user.getIdToken(true);
 
 const response = await fetch(
 
-`http://127.0.0.1:8000/admin/products/${productId}`,
+`${process.env.NEXT_PUBLIC_API_URL}/admin/products/${productId}`,
 
 {
 

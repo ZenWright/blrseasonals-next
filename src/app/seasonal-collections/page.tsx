@@ -13,7 +13,7 @@ async function getSeasonalCollections(): Promise<
   SeasonalCollection[]
 > {
   const response = await fetch(
-    "http://127.0.0.1:8000/seasonal-collections",
+    `${process.env.NEXT_PUBLIC_API_URL}/seasonal-collections`,
     {
       cache: "no-store",
     }

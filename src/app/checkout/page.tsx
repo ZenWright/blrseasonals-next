@@ -361,7 +361,7 @@ export default function CheckoutPage() {
        */
 
       const response = await fetch(
-        "http://127.0.0.1:8000/orders",
+        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
         {
           method: "POST",
 
@@ -446,7 +446,7 @@ export default function CheckoutPage() {
 // =====================================================
 
 const paymentResponse = await fetch(
-  "http://127.0.0.1:8000/payments/create",
+  `${process.env.NEXT_PUBLIC_API_URL}/payments/create`,
   {
     method: "POST",
     headers: {

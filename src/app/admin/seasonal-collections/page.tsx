@@ -96,7 +96,7 @@ export default function AdminSeasonalCollectionsPage() {
       const token = await getAdminToken();
 
       const response = await fetch(
-        "http://127.0.0.1:8000/admin/seasonal-collections",
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/seasonal-collections`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -154,7 +154,7 @@ export default function AdminSeasonalCollectionsPage() {
       const token = await getAdminToken();
 
       const response = await fetch(
-        "http://127.0.0.1:8000/admin/seasonal-collections",
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/seasonal-collections`,
         {
           method: "POST",
           headers: {
@@ -248,7 +248,7 @@ export default function AdminSeasonalCollectionsPage() {
       const token = await getAdminToken();
 
       const response = await fetch(
-        `http://127.0.0.1:8000/admin/seasonal-collections/${collectionId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/seasonal-collections/${collectionId}`,
         {
           method: "PUT",
           headers: {

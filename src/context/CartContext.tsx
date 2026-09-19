@@ -37,7 +37,7 @@ const CartContext = createContext<CartContextType | undefined>(
 );
 
 const CART_STORAGE_KEY = "blr-seasonals-cart";
-const PRODUCTS_API_URL = "http://127.0.0.1:8000/products";
+const PRODUCTS_API_URL = `${process.env.NEXT_PUBLIC_API_URL}/products`;
 
 export function CartProvider({
   children,

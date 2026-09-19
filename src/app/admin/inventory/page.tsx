@@ -64,7 +64,7 @@ export default function AdminInventoryPage() {
           // -------------------------------------------------
 
           const response = await fetch(
-            "http://127.0.0.1:8000/products",
+            `${process.env.NEXT_PUBLIC_API_URL}/products`,
             {
               cache: "no-store",
             }
@@ -181,7 +181,7 @@ export default function AdminInventoryPage() {
       // -----------------------------------------------------
 
       const response = await fetch(
-        `http://127.0.0.1:8000/admin/products/${product.id}/inventory`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/products/${product.id}/inventory`,
         {
           method: "PUT",
           headers: {

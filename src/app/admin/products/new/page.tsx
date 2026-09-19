@@ -114,7 +114,7 @@ export default function NewProductPage() {
     async function loadCategories() {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/categories"
+          `${process.env.NEXT_PUBLIC_API_URL}/categories`
         );
 
         if (!response.ok) {
@@ -162,7 +162,7 @@ export default function NewProductPage() {
         const token = await user.getIdToken(true);
 
         const response = await fetch(
-          "http://127.0.0.1:8000/admin/seasonal-collections",
+          `${process.env.NEXT_PUBLIC_API_URL}/admin/seasonal-collections`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -321,7 +321,7 @@ export default function NewProductPage() {
       // ---------------------------------------------------
 
       const response = await fetch(
-        "http://127.0.0.1:8000/admin/products",
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/products`,
         {
           method: "POST",
           headers: {
@@ -360,7 +360,7 @@ export default function NewProductPage() {
         Array.isArray(selectedSeasonalCollections)
       ) {
         const seasonalResponse = await fetch(
-          `http://127.0.0.1:8000/admin/products/${productId}/seasonal-collections`,
+          `${process.env.NEXT_PUBLIC_API_URL}/admin/products/${productId}/seasonal-collections`,
           {
             method: "PUT",
             headers: {

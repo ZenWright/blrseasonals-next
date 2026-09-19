@@ -54,7 +54,7 @@ export default function AdminCategoriesPage() {
 
   async function loadCategories(token: string) {
     const response = await fetch(
-      "http://127.0.0.1:8000/admin/categories",
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/categories`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -129,7 +129,7 @@ export default function AdminCategoriesPage() {
       const token = await getAdminToken();
 
       const response = await fetch(
-        "http://127.0.0.1:8000/admin/categories",
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/categories`,
         {
           method: "POST",
           headers: {
@@ -209,7 +209,7 @@ export default function AdminCategoriesPage() {
       const token = await getAdminToken();
 
       const response = await fetch(
-        `http://127.0.0.1:8000/admin/categories/${editingId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/categories/${editingId}`,
         {
           method: "PUT",
           headers: {

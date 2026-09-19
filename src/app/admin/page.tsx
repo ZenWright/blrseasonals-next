@@ -44,7 +44,7 @@ export default function AdminDashboardPage() {
           setCheckingAuth(false);
 
           const response = await fetch(
-            "http://127.0.0.1:8000/products",
+            `${process.env.NEXT_PUBLIC_API_URL}/products`,
             {
               cache: "no-store",
             }
