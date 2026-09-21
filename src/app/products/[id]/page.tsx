@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import WhatsAppButton from "@/components/WhatsAppButton";
 import ProductGallery from "@/components/ProductGallery";
 import ProductActions from "@/components/ProductActions";
 import type { Product } from "@/types/product";
@@ -23,7 +24,9 @@ async function getProduct(id: string): Promise<Product | null> {
 
     const products: Product[] = await response.json();
 
-    return products.find((product) => product.id === id) ?? null;
+    return products.find(
+  (product) => String(product.id) === String(id)
+) ?? null;
   } catch (error) {
     console.error("Failed to load product:", error);
     return null;
@@ -308,7 +311,14 @@ export default async function ProductPage({
         </div>
 
       </section>
-
+      <WhatsAppButton
+  
+    product={{
+    id: product.id,
+    name: product.name,
+    price: product.price,
+  }}
+/>
     </main>
   );
 }
