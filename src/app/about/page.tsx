@@ -254,6 +254,35 @@ export default function AboutPage() {
           Footer
       ===================================================== */}
 
+{/* Location */}
+<section className="mx-auto max-w-7xl px-6 py-16">
+  <div className="rounded-2xl border border-stone-200 bg-stone-50 p-8 md:p-10">
+    <div className="text-center">
+      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-stone-500">
+        Visit Us
+      </p>
+
+      <h2 className="mt-3 font-serif text-3xl font-semibold text-stone-900">
+        Find BLR Seasonals
+      </h2>
+
+      <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-stone-600">
+        8/2, Mary's Layout, 1st Cross St, Nagawara Main Rd,
+        Nagawara, Bengaluru, Karnataka – 560045
+      </p>
+
+      <a
+        href="https://maps.app.goo.gl/dnMaQzBaafsspPyu5"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-6 inline-flex rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-stone-700"
+      >
+        View Our Location on Google Maps →
+      </a>
+    </div>
+  </div>
+</section>
+
       <footer className="border-t border-stone-200">
 
         <div className="mx-auto max-w-7xl px-6 py-8">
