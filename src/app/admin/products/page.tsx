@@ -274,48 +274,49 @@ export default function AdminProductsPage() {
 
                       {/* Product */}
 
-                      <td className="px-5 py-4">
+<td className="px-5 py-4">
+  <div className="flex min-w-[280px] items-center gap-4">
 
-                        <div className="flex items-center gap-4">
+    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-stone-200 bg-stone-100">
 
-                          <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-stone-100">
+      <div className="absolute inset-0 flex items-center justify-center text-center text-[10px] font-medium text-stone-400">
+        No image
+      </div>
 
-                            {product.images?.[0] ? (
-                              <img
-                                src={product.images[0]}
-                                alt={product.name}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-xs text-stone-400">
-                                No image
-                              </div>
-                            )}
+      {product.images?.[0] && (
+        <img
+          src={product.images[0]}
+          alt={product.name}
+          className="relative h-full w-full object-cover"
+          onError={(event) => {
+            event.currentTarget.style.display = "none";
+          }}
+        />
+      )}
 
-                          </div>
+    </div>
 
-                          <div className="min-w-0">
+    <div className="min-w-0">
 
-                            <p className="font-semibold text-stone-900">
-                              {product.name}
-                            </p>
+      <p className="font-semibold text-stone-900">
+        {product.name}
+      </p>
 
-                            <p className="mt-1 text-xs text-stone-500">
-                              ID: {product.id}
-                            </p>
+      <p className="mt-1 text-xs text-stone-500">
+        ID: {product.id}
+      </p>
 
-                          </div>
+    </div>
 
-                        </div>
-
-                      </td>
+  </div>
+</td>
 
                       {/* Category */}
 
                       <td className="px-5 py-4">
 
                         <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-700">
-                          {product.category || "Uncategorized"}
+                          {product.category ?? "Uncategorized"}
                         </span>
 
                       </td>
