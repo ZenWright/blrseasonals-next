@@ -400,19 +400,85 @@ export default function AdminProductsPage() {
 
                       {/* Actions */}
 
-                      <td className="px-5 py-4">
+<td className="px-5 py-4">
 
-                        <button
-  type="button"
-  onClick={() =>
-    router.push(`/admin/products/${product.id}`)
-  }
-  className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-900 hover:text-white"
->
-  Edit
-</button>
+  <div className="flex items-center gap-2">
 
-                      </td>
+    <button
+      type="button"
+      onClick={() =>
+        router.push(`/admin/products/${product.id}`)
+      }
+      className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-900 hover:text-white"
+    >
+      Edit
+    </button>
+
+    <button
+      type="button"
+      onClick={async () => {
+        const confirmed = window.confirm(
+          `Are you sure you want to delete "${product.name}"?`
+        );
+
+        if (!confirmed) {
+          return;
+        }
+
+        try {
+          const user = auth.currentUser;
+
+          if (!user) {
+            alert("Admin session expired. Please login again.");
+            router.replace("/admin/login");
+            return;
+          }
+
+          const token = await user.getIdToken();
+
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/admin/products/${product.id}`,
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data.detail || "Failed to delete product."
+            );
+          }
+
+          setProducts((currentProducts) =>
+            currentProducts.filter(
+              (item) => item.id !== product.id
+            )
+          );
+
+          alert("Product deleted successfully.");
+        } catch (error) {
+          console.error("Product deletion failed:", error);
+
+          alert(
+            error instanceof Error
+              ? error.message
+              : "Failed to delete product."
+          );
+        }
+      }}
+      className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-600 hover:text-white"
+    >
+      Delete
+    </button>
+
+  </div>
+
+</td>
 
                     </tr>
 
