@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BLR Seasonals 🪵
 
-## Getting Started
+### Production E-Commerce Website for Wooden Decor & Lifestyle Products
 
-First, run the development server:
+BLR Seasonals is a production-ready e-commerce platform built for a seasonal wooden decor and lifestyle products business.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+🌐 **Live Website:** https://blrseasonals.shop
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛍️ About the Project
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+BLR Seasonals is an e-commerce website designed to showcase and sell handcrafted wooden items, antique-style decor, showpieces, clocks, telephones, gramophones, and other seasonal lifestyle products.
 
-## Learn More
+The platform was built with a focus on:
 
-To learn more about Next.js, take a look at the following resources:
+- Premium product presentation
+- Responsive user experience
+- Product search and filtering
+- Shopping cart functionality
+- Checkout and order processing
+- Inventory management
+- Admin product management
+- Secure authentication
+- Production deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ✨ Key Features
 
-## Deploy on Vercel
+### Customer Experience
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- 🏠 Premium responsive homepage
+- 🛍️ Product catalogue
+- 🔎 Product search
+- 🏷️ Category and collection filtering
+- 💰 Selling price, MRP and discount display
+- 📦 Real-time inventory-based availability
+- 🛒 Shopping cart
+- 💳 Checkout flow
+- 📱 WhatsApp product enquiry
+- 📱 Mobile-friendly responsive design
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Admin & Business Management
+
+- 🔐 Firebase-based admin authentication
+- 📊 Admin dashboard
+- ➕ Add products
+- ✏️ Update product information
+- 💰 Manage pricing and MRP
+- 📦 Manage inventory
+- 🖼️ Manage product images
+- 📋 Manage product catalogue
+- 🧾 Order management
+
+---
+
+## 🏗️ Technology Stack
+
+### Frontend
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+
+### Backend
+
+- FastAPI
+- Python
+
+### Database
+
+- MySQL
+
+### Authentication
+
+- Firebase Authentication
+
+### Deployment
+
+- Vercel — Frontend
+- Railway — Backend & Production Database
+
+---
+
+## 🧩 Project Architecture
+
+```text
+Customer
+   │
+   ▼
+BLR Seasonals Website
+   │
+   │  Next.js / React
+   ▼
+FastAPI Backend
+   │
+   ▼
+MySQL Database
