@@ -194,7 +194,18 @@ export default async function ProductsPage() {
 
         </div>
 
-      </footer>
+            </footer>
+
+      {/* =====================================================
+          Floating Cart Button
+      ===================================================== */}
+      <Link
+        href="/cart"
+        aria-label="Open shopping cart"
+        className="fixed bottom-24 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-black text-2xl text-white shadow-lg transition hover:scale-105 hover:bg-gray-800"
+      >
+        🛒
+      </Link>
 
     </main>
   );
