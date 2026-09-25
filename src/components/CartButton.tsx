@@ -1,29 +1,45 @@
 "use client";
 
-import Link from "next/link";
-import { useCart } from "@/context/CartContext";
+type WhatsAppButtonProps = {
+  product?: {
+    id: string | number;
+    name: string;
+    price: number;
+  };
+};
 
-export default function CartButton() {
-  const { cartCount } = useCart();
+export default function WhatsAppButton({
+  product,
+}: WhatsAppButtonProps) {
+  const phoneNumber = "919319780827";
+
+  const handleWhatsApp = () => {
+    let message = "Hi, I'm interested in a product from BLR Seasonals.";
+
+    if (product) {
+      message =
+        `Hi, I'm interested in this product from BLR Seasonals.\n\n` +
+        `Product: ${product.name}\n` +
+        `Product ID: ${product.id}\n` +
+        `Price: ₹${product.price.toLocaleString("en-IN")}\n\n` +
+        `Product link: ${window.location.href}`;
+    }
+
+    const whatsappUrl =
+      `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappUrl, "_blank");
+  };
 
   return (
-    <Link
-      href="/cart"
-      className="group relative z-50 inline-flex cursor-pointer items-center gap-2 rounded-full border border-black/15 bg-white px-4 py-2 text-sm font-medium text-gray-800 transition hover:border-black hover:bg-black hover:text-white"
+    <button
+      type="button"
+      onClick={handleWhatsApp}
+      aria-label="Chat with BLR Seasonals on WhatsApp"
+      className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-green-500 px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-105 hover:bg-green-600"
     >
-      <span className="text-base">
-        🛒
-      </span>
-
-      <span>
-        Cart
-      </span>
-
-      {cartCount > 0 && (
-        <span className="flex min-w-5 items-center justify-center rounded-full bg-black px-1.5 py-0.5 text-[10px] font-bold text-white transition group-hover:bg-white group-hover:text-black">
-          {cartCount}
-        </span>
-      )}
-    </Link>
+      <span className="text-xl">💬</span>
+      <span>WhatsApp</span>
+    </button>
   );
 }
