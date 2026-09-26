@@ -575,9 +575,17 @@ function OrderConfirmationContent() {
             </div>
 
 
-            <span className="inline-flex w-fit rounded-full bg-yellow-100 px-4 py-2 text-xs font-semibold text-yellow-800">
-              Awaiting Payment
-            </span>
+            <span
+  className={`inline-flex w-fit rounded-full px-4 py-2 text-xs font-semibold ${
+    order.paymentStatus === "Paid"
+      ? "bg-green-100 text-green-800"
+      : "bg-yellow-100 text-yellow-800"
+  }`}
+>
+  {order.paymentStatus === "Paid"
+    ? "Payment Successful"
+    : "Awaiting Payment"}
+</span>
 
           </div>
 
