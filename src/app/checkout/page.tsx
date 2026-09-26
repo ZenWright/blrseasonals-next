@@ -482,7 +482,7 @@ if (!paymentData.payment_session_id) {
 // =====================================================
 
 const cashfree = await load({
-  mode: "sandbox",
+  mode: "production",
 });
 
 if (!cashfree) {
