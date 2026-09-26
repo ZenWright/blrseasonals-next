@@ -19,81 +19,91 @@ export default function PaymentReturnPage() {
 
   const [orderNumber, setOrderNumber] =
     useState("");
-const retryPayment = async () => {
-  if (!orderNumber) {
-    return;
-  }
 
-  try {
-    setStatus("checking");
-    setMessage("Preparing your payment...");
+  // =============================================================
+  // Retry Payment
+  // =============================================================
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/payments/create`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          order_number: orderNumber,
-          return_url:
-            `${window.location.origin}/payment-return?orderId=${encodeURIComponent(
-              orderNumber
-            )}`,
-        }),
+  const retryPayment = async () => {
+    if (!orderNumber) {
+      return;
+    }
+
+    try {
+      setStatus("checking");
+      setMessage("Preparing your payment...");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/payments/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            order_number: orderNumber,
+            return_url:
+              `${window.location.origin}/payment-return?orderId=${encodeURIComponent(
+                orderNumber
+              )}`,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail ||
+            "Unable to start payment."
+        );
       }
-    );
 
-    const data = await response.json();
+      if (!data.payment_session_id) {
+        throw new Error(
+          "Payment session was not created."
+        );
+      }
 
-    if (!response.ok) {
-      throw new Error(
-        data.detail ||
-          "Unable to start payment."
+      const { load } =
+        await import(
+          "@cashfreepayments/cashfree-js"
+        );
+
+      const cashfree = await load({
+        mode: "production",
+      });
+
+      if (!cashfree) {
+        throw new Error(
+          "Cashfree payment system could not be loaded."
+        );
+      }
+
+      await cashfree.checkout({
+        paymentSessionId:
+          data.payment_session_id,
+      });
+    } catch (error) {
+      console.error(
+        "Retry payment failed:",
+        error
+      );
+
+      setStatus("error");
+
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to restart payment."
       );
     }
+  };
 
-    if (!data.payment_session_id) {
-      throw new Error(
-        "Payment session was not created."
-      );
-    }
+  // =============================================================
+  // Verify Payment
+  // =============================================================
 
-    const { load } =
-      await import(
-        "@cashfreepayments/cashfree-js"
-      );
-
-    const cashfree = await load({
-      mode: "sandbox",
-    });
-
-    if (!cashfree) {
-      throw new Error(
-        "Cashfree payment system could not be loaded."
-      );
-    }
-
-    await cashfree.checkout({
-      paymentSessionId:
-        data.payment_session_id,
-    });
-  } catch (error) {
-    console.error(
-      "Retry payment failed:",
-      error
-    );
-
-    setStatus("error");
-
-    setMessage(
-      error instanceof Error
-        ? error.message
-        : "Unable to restart payment."
-    );
-  }
-};
   useEffect(() => {
     const verifyPayment = async () => {
       try {
@@ -106,11 +116,13 @@ const retryPayment = async () => {
         );
 
         /*
-         * Cashfree appends:
+         * Cashfree normally returns:
          *
          * ?order_id=BLR-XXXXXXXX
          *
-         * We also keep support for our own orderId parameter.
+         * We also support our own:
+         *
+         * ?orderId=BLR-XXXXXXXX
          */
 
         const cashfreeOrderId =
@@ -131,81 +143,159 @@ const retryPayment = async () => {
         setOrderNumber(currentOrderNumber);
 
         // ---------------------------------------------------------
-        // Ask FastAPI to verify the payment with Cashfree
+        // Verify payment with automatic retries
         // ---------------------------------------------------------
 
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/payments/verify`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              order_number:
-                currentOrderNumber,
-            }),
+        const maxAttempts = 5;
+        const retryDelay = 2000;
+
+        for (
+          let attempt = 1;
+          attempt <= maxAttempts;
+          attempt++
+        ) {
+          try {
+            setStatus("checking");
+
+            if (attempt === 1) {
+              setMessage(
+                "Verifying your payment with Cashfree..."
+              );
+            } else {
+              setMessage(
+                `Payment is still being processed. Checking again (${attempt}/${maxAttempts})...`
+              );
+            }
+
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/payments/verify`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type":
+                    "application/json",
+                },
+                body: JSON.stringify({
+                  order_number:
+                    currentOrderNumber,
+                }),
+              }
+            );
+
+            const data =
+              await response.json();
+
+            // -----------------------------------------------------
+            // Backend error
+            // -----------------------------------------------------
+
+            if (!response.ok) {
+              throw new Error(
+                data.detail ||
+                  "Unable to verify payment."
+              );
+            }
+
+            // -----------------------------------------------------
+            // Payment successful
+            // -----------------------------------------------------
+
+            if (
+              data.success === true &&
+              data.payment_status === "Paid"
+            ) {
+              setStatus("success");
+
+              setMessage(
+                "Payment verified successfully."
+              );
+
+              // Give the backend/database a moment
+              // before loading the order confirmation page.
+              setTimeout(() => {
+                window.location.href =
+                  `/order-confirmation?orderId=${encodeURIComponent(
+                    currentOrderNumber
+                  )}`;
+              }, 1500);
+
+              return;
+            }
+
+            // -----------------------------------------------------
+            // Payment still pending
+            // -----------------------------------------------------
+
+            const paymentStatus =
+              String(
+                data.payment_status || ""
+              ).toUpperCase();
+
+            if (
+              paymentStatus === "PENDING"
+            ) {
+              if (
+                attempt < maxAttempts
+              ) {
+                await new Promise(
+                  (resolve) =>
+                    setTimeout(
+                      resolve,
+                      retryDelay
+                    )
+                );
+
+                continue;
+              }
+
+              // All verification attempts
+              // have been exhausted.
+              setStatus("pending");
+
+              setMessage(
+                "Your payment is still being processed. Please wait a moment and check your order status."
+              );
+
+              return;
+            }
+
+            // -----------------------------------------------------
+            // Payment failed / not completed
+            // -----------------------------------------------------
+
+            setStatus("failed");
+
+            setMessage(
+              data.message ||
+                "Payment was not completed."
+            );
+
+            return;
+          } catch (error) {
+            console.error(
+              `Payment verification attempt ${attempt} failed:`,
+              error
+            );
+
+            // Retry temporary verification
+            // failures as well.
+            if (
+              attempt < maxAttempts
+            ) {
+              await new Promise(
+                (resolve) =>
+                  setTimeout(
+                    resolve,
+                    retryDelay
+                  )
+              );
+
+              continue;
+            }
+
+            throw error;
           }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            data.detail ||
-              "Unable to verify payment."
-          );
         }
-
-        // ---------------------------------------------------------
-        // Payment successful
-        // ---------------------------------------------------------
-
-        if (
-          data.success === true &&
-          data.payment_status === "Paid"
-        ) {
-          setStatus("success");
-          setMessage(
-            "Payment verified successfully."
-          );
-
-          // Give the customer a moment to see
-          // the successful payment message.
-          setTimeout(() => {
-            window.location.href =
-              `/order-confirmation?orderId=${encodeURIComponent(
-                currentOrderNumber
-              )}`;
-          }, 1200);
-
-          return;
-        }
-
-        // ---------------------------------------------------------
-        // Payment still pending
-        // ---------------------------------------------------------
-
-        if (
-          data.payment_status === "PENDING"
-        ) {
-          setStatus("pending");
-          setMessage(
-            "Your payment is still being processed. Please wait a moment and check your order status."
-          );
-
-          return;
-        }
-
-        // ---------------------------------------------------------
-        // Payment failed / not completed
-        // ---------------------------------------------------------
-
-        setStatus("failed");
-        setMessage(
-          data.message ||
-            "Payment was not completed."
-        );
       } catch (error) {
         console.error(
           "Payment verification failed:",
@@ -241,8 +331,7 @@ const retryPayment = async () => {
             </h1>
 
             <p className="mt-3 text-sm leading-6 text-gray-600">
-              Please wait while we securely verify
-              your payment with Cashfree.
+              {message}
             </p>
 
             {orderNumber && (
@@ -330,9 +419,19 @@ const retryPayment = async () => {
           )}
 
           <div className="mt-8 flex flex-col gap-3">
+            {(status === "pending" ||
+              status === "error") && (
+              <button
+                onClick={retryPayment}
+                className="rounded-xl bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+              >
+                Try Payment Again
+              </button>
+            )}
+
             <Link
               href="/checkout"
-              className="rounded-xl bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+              className="rounded-xl border border-black/10 px-6 py-3 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
             >
               Return to Checkout
             </Link>
