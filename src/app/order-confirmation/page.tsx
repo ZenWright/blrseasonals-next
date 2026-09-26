@@ -33,7 +33,7 @@ type Order = {
   total: number;
 
   status: string;
-  paymentStatus: string;
+  payment_status: string;
 
   createdAt: string | null;
 };
@@ -569,7 +569,7 @@ function OrderConfirmationContent() {
 
 
               <p className="mt-1 text-xs text-gray-500">
-                Payment status: {order.paymentStatus}
+                Payment status: {order.payment_status}
               </p>
 
             </div>
@@ -577,12 +577,12 @@ function OrderConfirmationContent() {
 
             <span
   className={`inline-flex w-fit rounded-full px-4 py-2 text-xs font-semibold ${
-    order.paymentStatus === "Paid"
+    order.payment_status === "Paid"
       ? "bg-green-100 text-green-800"
       : "bg-yellow-100 text-yellow-800"
   }`}
 >
-  {order.paymentStatus === "Paid"
+  {order.payment_status === "Paid"
     ? "Payment Successful"
     : "Awaiting Payment"}
 </span>
