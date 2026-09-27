@@ -1,7 +1,5 @@
 "use client";
 
-
-
 import Link from "next/link";
 
 import { useState } from "react";
@@ -10,861 +8,769 @@ import { load } from "@cashfreepayments/cashfree-js";
 
 import type {
 
-  ChangeEvent,
+  ChangeEvent,
 
-  FormEvent,
+  FormEvent,
 
 } from "react";
 
 import { useCart } from "@/context/CartContext";
 
-
-
-
-
 type CheckoutForm = {
 
-  name: string;
+  name: string;
 
-  phone: string;
+  phone: string;
 
-  email: string;
+  email: string;
 
-  address: string;
+  address: string;
 
-  city: string;
+  city: string;
 
-  state: string;
+  state: string;
 
-  pincode: string;
+  pincode: string;
 
 };
-
-
-
 
 
 type FormErrors = {
 
-  name: string;
+  name: string;
 
-  phone: string;
+  phone: string;
 
-  email: string;
+  email: string;
 
-  address: string;
+  address: string;
 
-  city: string;
+  city: string;
 
-  state: string;
+  state: string;
 
-  pincode: string;
+  pincode: string;
 
 };
 
-
-
-
-
 export default function CheckoutPage() {
 
+  const {
 
+    cartItems,
 
-  const {
+    cartSubtotal,
 
-    cartItems,
+  } = useCart();
 
-    cartSubtotal,
+  // =========================================================
 
-  } = useCart();
+  // Form State
 
+  // =========================================================
 
+  const [form, setForm] =
 
+    useState<CheckoutForm>({
 
+      name: "",
 
-  // =========================================================
+      phone: "",
 
-  // Form State
+      email: "",
 
-  // =========================================================
+      address: "",
 
+      city: "",
 
+      state: "",
 
-  const [form, setForm] =
+      pincode: "",
 
-    useState<CheckoutForm>({
+    });
 
-      name: "",
+  // =========================================================
 
-      phone: "",
+  // Validation Errors
 
-      email: "",
+  // =========================================================
 
-      address: "",
+  const [errors, setErrors] =
 
-      city: "",
+    useState<FormErrors>({
 
-      state: "",
+      name: "",
 
-      pincode: "",
+      phone: "",
 
-    });
+      email: "",
 
+      address: "",
 
+      city: "",
 
+      state: "",
 
+      pincode: "",
 
-  // =========================================================
+    });
 
-  // Validation Errors
+  // =========================================================
 
-  // =========================================================
+  // Submit State
 
+  // =========================================================
 
+  const [isSubmitting, setIsSubmitting] =
 
-  const [errors, setErrors] =
+    useState(false);
 
-    useState<FormErrors>({
-
-      name: "",
-
-      phone: "",
-
-      email: "",
-
-      address: "",
-
-      city: "",
-
-      state: "",
-
-      pincode: "",
-
-    });
-
-
-
-
-
-  // =========================================================
-
-  // Submit State
-
-  // =========================================================
-
-
-
-  const [isSubmitting, setIsSubmitting] =
-
-    useState(false);
-
-
-
-
-
-
-
-  // Shipping Rules
+  // Shipping Rules
 
 // Free shipping on all orders
 
 const shippingCost = 0;
 
-
-
 const orderTotal =
 
-  cartSubtotal + shippingCost;
+  cartSubtotal + shippingCost;
 
+  // =========================================================
 
+  // Format Price
 
+  // =========================================================
 
+  const formatPrice = (price: number) => {
 
-  // =========================================================
+    return `₹${price.toLocaleString("en-IN")}`;
 
-  // Format Price
+  };
 
-  // =========================================================
+  // =========================================================
 
+  // Handle Input Changes
 
+  // =========================================================
 
-  const formatPrice = (price: number) => {
+  const handleChange = (
 
+    event: ChangeEvent<
 
+      HTMLInputElement | HTMLTextAreaElement
 
-    return `₹${price.toLocaleString("en-IN")}`;
+    >
 
+  ) => {
 
+    const {
 
-  };
+      name,
 
+      value,
 
+    } = event.target;
 
+    setForm((current) => ({
 
+      ...current,
 
-  // =========================================================
+      [name]: value,
 
-  // Handle Input Changes
+    }));
 
-  // =========================================================
+    setErrors((current) => ({
 
+      ...current,
 
+      [name]: "",
 
-  const handleChange = (
+    }));
 
-    event: ChangeEvent<
+  };
 
-      HTMLInputElement | HTMLTextAreaElement
+  // =========================================================
 
-    >
+  // Validate Form
 
-  ) => {
+  // =========================================================
 
+  const validateForm = () => {
 
+    const newErrors: FormErrors = {
 
-    const {
+      name: "",
 
-      name,
+      phone: "",
 
-      value,
+      email: "",
 
-    } = event.target;
+      address: "",
 
+      city: "",
 
+      state: "",
 
+      pincode: "",
 
+    };
 
-    setForm((current) => ({
+    // -------------------------------------------------------
 
-      ...current,
+    // Name
 
-      [name]: value,
+    // -------------------------------------------------------
 
-    }));
 
+    if (!form.name.trim()) {
 
+      newErrors.name =
 
+        "Please enter your full name.";
 
+    } else if (
 
-    setErrors((current) => ({
+      form.name.trim().length < 2
 
-      ...current,
+    ) {
 
-      [name]: "",
+      newErrors.name =
 
-    }));
+        "Please enter a valid name.";
 
+    }
 
+    // -------------------------------------------------------
 
-  };
+    // Mobile
 
+    // -------------------------------------------------------
 
 
 
+    if (!form.phone.trim()) {
 
-  // =========================================================
 
-  // Validate Form
 
-  // =========================================================
+      newErrors.phone =
 
+        "Please enter your mobile number.";
 
 
-  const validateForm = () => {
 
+    } else if (
 
+      !/^[6-9]\d{9}$/.test(
 
-    const newErrors: FormErrors = {
+        form.phone.trim()
 
-      name: "",
+      )
 
-      phone: "",
+    ) {
 
-      email: "",
 
-      address: "",
 
-      city: "",
+      newErrors.phone =
 
-      state: "",
+        "Please enter a valid 10-digit Indian mobile number.";
 
-      pincode: "",
 
-    };
 
+    }
 
 
 
 
-    // -------------------------------------------------------
 
-    // Name
+    // -------------------------------------------------------
 
-    // -------------------------------------------------------
+    // Email
 
+    // -------------------------------------------------------
 
 
-    if (!form.name.trim()) {
 
+    if (!form.email.trim()) {
 
 
-      newErrors.name =
 
-        "Please enter your full name.";
+      newErrors.email =
 
+        "Please enter your email address.";
 
 
-    } else if (
 
-      form.name.trim().length < 2
+    } else if (
 
-    ) {
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
 
+        form.email.trim()
 
+      )
 
-      newErrors.name =
+    ) {
 
-        "Please enter a valid name.";
 
 
+      newErrors.email =
 
-    }
+        "Please enter a valid email address.";
 
 
 
+    }
 
 
-    // -------------------------------------------------------
 
-    // Mobile
 
-    // -------------------------------------------------------
 
+    // -------------------------------------------------------
 
+    // Address
 
-    if (!form.phone.trim()) {
+    // -------------------------------------------------------
 
 
 
-      newErrors.phone =
+    if (!form.address.trim()) {
 
-        "Please enter your mobile number.";
 
 
+      newErrors.address =
 
-    } else if (
+        "Please enter your delivery address.";
 
-      !/^[6-9]\d{9}$/.test(
 
-        form.phone.trim()
 
-      )
+    } else if (
 
-    ) {
+      form.address.trim().length < 10
 
+    ) {
 
 
-      newErrors.phone =
 
-        "Please enter a valid 10-digit Indian mobile number.";
+      newErrors.address =
 
+        "Please enter a more complete delivery address.";
 
 
-    }
 
+    }
 
 
 
 
-    // -------------------------------------------------------
 
-    // Email
+    // -------------------------------------------------------
 
-    // -------------------------------------------------------
+    // City
 
+    // -------------------------------------------------------
 
 
-    if (!form.email.trim()) {
 
+    if (!form.city.trim()) {
 
 
-      newErrors.email =
 
-        "Please enter your email address.";
+      newErrors.city =
 
+        "Please enter your city.";
 
 
-    } else if (
 
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    }
 
-        form.email.trim()
 
-      )
 
-    ) {
 
 
+    // -------------------------------------------------------
 
-      newErrors.email =
+    // State
 
-        "Please enter a valid email address.";
+    // -------------------------------------------------------
 
 
 
-    }
+    if (!form.state.trim()) {
 
 
 
+      newErrors.state =
 
+        "Please enter your state.";
 
-    // -------------------------------------------------------
 
-    // Address
 
-    // -------------------------------------------------------
+    }
 
 
 
-    if (!form.address.trim()) {
 
 
+    // -------------------------------------------------------
 
-      newErrors.address =
+    // PIN Code
 
-        "Please enter your delivery address.";
+    // -------------------------------------------------------
 
 
 
-    } else if (
+    if (!form.pincode.trim()) {
 
-      form.address.trim().length < 10
 
-    ) {
 
+      newErrors.pincode =
 
+        "Please enter your PIN code.";
 
-      newErrors.address =
 
-        "Please enter a more complete delivery address.";
 
+    } else if (
 
+      !/^\d{6}$/.test(
 
-    }
+        form.pincode.trim()
 
+      )
 
+    ) {
 
 
 
-    // -------------------------------------------------------
+      newErrors.pincode =
 
-    // City
+        "PIN code must contain exactly 6 digits.";
 
-    // -------------------------------------------------------
 
 
+    }
 
-    if (!form.city.trim()) {
 
 
 
-      newErrors.city =
 
-        "Please enter your city.";
+    setErrors(newErrors);
 
 
 
-    }
 
 
+    return !Object.values(newErrors).some(
 
+      (error) => error !== ""
 
+    );
 
-    // -------------------------------------------------------
 
-    // State
 
-    // -------------------------------------------------------
+  };
 
 
 
-    if (!form.state.trim()) {
 
 
+  // =========================================================
 
-      newErrors.state =
+  // Submit Order
 
-        "Please enter your state.";
+  // =========================================================
 
 
 
-    }
+  const handleSubmit = async (
 
+    event: FormEvent<HTMLFormElement>
 
+  ) => {
 
 
 
-    // -------------------------------------------------------
+    event.preventDefault();
 
-    // PIN Code
 
-    // -------------------------------------------------------
 
 
 
-    if (!form.pincode.trim()) {
+    // -------------------------------------------------------
 
+    // Validate Form
 
+    // -------------------------------------------------------
 
-      newErrors.pincode =
 
-        "Please enter your PIN code.";
 
+    if (!validateForm()) {
 
 
-    } else if (
 
-      !/^\d{6}$/.test(
+      return;
 
-        form.pincode.trim()
 
-      )
 
-    ) {
+    }
 
 
 
-      newErrors.pincode =
 
-        "PIN code must contain exactly 6 digits.";
 
+    // -------------------------------------------------------
 
+    // Make Sure Cart Has Products
 
-    }
+    // -------------------------------------------------------
 
 
 
+    if (cartItems.length === 0) {
 
 
-    setErrors(newErrors);
 
+      alert(
 
+        "Your cart is empty."
 
+      );
 
 
-    return !Object.values(newErrors).some(
 
-      (error) => error !== ""
+      return;
 
-    );
 
 
+    }
 
-  };
 
 
 
 
+    setIsSubmitting(true);
 
-  // =========================================================
 
-  // Submit Order
 
-  // =========================================================
 
 
+    try {
 
-  const handleSubmit = async (
 
-    event: FormEvent<HTMLFormElement>
 
-  ) => {
+      // =====================================================
 
+      // Send Order to FastAPI
 
+      // =====================================================
 
-    event.preventDefault();
 
 
+      /*
 
+       * IMPORTANT:
 
+       *
 
-    // -------------------------------------------------------
+       * We send only:
 
-    // Validate Form
+       *
 
-    // -------------------------------------------------------
+       * - Customer details
 
+       * - Product IDs
 
+       * - Quantities
 
-    if (!validateForm()) {
+       *
 
+       * FastAPI gets the real product prices
 
+       * from MySQL.
 
-      return;
+       *
 
+       * FastAPI calculates:
 
+       *
 
-    }
+       * - Subtotal
 
+       * - Shipping
 
+       * - Total
 
+       *
 
+       * This prevents the frontend from controlling
 
-    // -------------------------------------------------------
+       * the final order price.
 
-    // Make Sure Cart Has Products
+       */
 
-    // -------------------------------------------------------
 
 
+      const response = await fetch(
 
-    if (cartItems.length === 0) {
+        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
 
+        {
 
+          method: "POST",
 
-      alert(
 
-        "Your cart is empty."
 
-      );
+          headers: {
 
+            "Content-Type": "application/json",
 
+          },
 
-      return;
 
 
+          body: JSON.stringify({
 
-    }
 
 
+            customer_name:
 
+              form.name.trim(),
 
 
-    setIsSubmitting(true);
 
+            mobile:
 
+              form.phone.trim(),
 
 
 
-    try {
+            email:
 
+              form.email.trim(),
 
 
-      // =====================================================
 
-      // Send Order to FastAPI
+            address:
 
-      // =====================================================
+              form.address.trim(),
 
 
 
-      /*
+            city:
 
-       * IMPORTANT:
+              form.city.trim(),
 
-       *
 
-       * We send only:
 
-       *
+            state:
 
-       * - Customer details
+              form.state.trim(),
 
-       * - Product IDs
 
-       * - Quantities
 
-       *
+            pincode:
 
-       * FastAPI gets the real product prices
+              form.pincode.trim(),
 
-       * from MySQL.
 
-       *
 
-       * FastAPI calculates:
+            items:
 
-       *
+              cartItems.map((item) => ({
 
-       * - Subtotal
+                product_id:
 
-       * - Shipping
+                  Number(item.product.id),
 
-       * - Total
 
-       *
 
-       * This prevents the frontend from controlling
+                quantity:
 
-       * the final order price.
+                  item.quantity,
 
-       */
+              })),
 
 
 
-      const response = await fetch(
+          }),
 
-        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
+        }
 
-        {
+      );
 
-          method: "POST",
 
 
 
-          headers: {
 
-            "Content-Type": "application/json",
+      // =====================================================
 
-          },
+      // Read API Response
 
+      // =====================================================
 
 
-          body: JSON.stringify({
 
+      const data =
 
+        await response.json();
 
-            customer_name:
 
-              form.name.trim(),
 
 
 
-            mobile:
+      // =====================================================
 
-              form.phone.trim(),
+      // Handle API Error
 
+      // =====================================================
 
 
-            email:
 
-              form.email.trim(),
+      if (!response.ok) {
 
 
 
-            address:
+        throw new Error(
 
-              form.address.trim(),
+          data.detail ||
 
+          "Failed to create order."
 
+        );
 
-            city:
 
-              form.city.trim(),
 
+      }
 
 
-            state:
 
-              form.state.trim(),
 
 
+      // =====================================================
 
-            pincode:
+      // Verify Order Number
 
-              form.pincode.trim(),
+      // =====================================================
 
 
 
-            items:
+      if (!data.order_number) {
 
-              cartItems.map((item) => ({
 
-                product_id:
 
-                  Number(item.product.id),
+        throw new Error(
 
+          "Order was created but no order number was returned."
 
+        );
 
-                quantity:
 
-                  item.quantity,
 
-              })),
+      }
 
 
 
-          }),
 
-        }
 
-      );
-
-
-
-
-
-      // =====================================================
-
-      // Read API Response
-
-      // =====================================================
-
-
-
-      const data =
-
-        await response.json();
-
-
-
-
-
-      // =====================================================
-
-      // Handle API Error
-
-      // =====================================================
-
-
-
-      if (!response.ok) {
-
-
-
-        throw new Error(
-
-          data.detail ||
-
-          "Failed to create order."
-
-        );
-
-
-
-      }
-
-
-
-
-
-      // =====================================================
-
-      // Verify Order Number
-
-      // =====================================================
-
-
-
-      if (!data.order_number) {
-
-
-
-        throw new Error(
-
-          "Order was created but no order number was returned."
-
-        );
-
-
-
-      }
-
-
-
-
-
-      // =====================================================
+      // =====================================================
 
 // Create Cashfree Payment
 
@@ -874,33 +780,33 @@ const orderTotal =
 
 const paymentResponse = await fetch(
 
-  `${process.env.NEXT_PUBLIC_API_URL}/payments/create`,
+  `${process.env.NEXT_PUBLIC_API_URL}/payments/create`,
 
-  {
+  {
 
-    method: "POST",
+    method: "POST",
 
-    headers: {
+    headers: {
 
-      "Content-Type": "application/json",
+      "Content-Type": "application/json",
 
-    },
+    },
 
-    body: JSON.stringify({
+    body: JSON.stringify({
 
-      order_number: data.order_number,
+      order_number: data.order_number,
 
-      return_url:
+      return_url:
 
-        `${window.location.origin}/payment-return?orderId=${encodeURIComponent(
+        `${window.location.origin}/payment-return?orderId=${encodeURIComponent(
 
-          data.order_number
+          data.order_number
 
-        )}`,
+        )}`,
 
-    }),
+    }),
 
-  }
+  }
 
 );
 
@@ -912,13 +818,13 @@ const paymentData = await paymentResponse.json();
 
 if (!paymentResponse.ok) {
 
-  throw new Error(
+  throw new Error(
 
-    paymentData.detail ||
+    paymentData.detail ||
 
-      "Unable to start payment."
+      "Unable to start payment."
 
-  );
+  );
 
 }
 
@@ -926,11 +832,11 @@ if (!paymentResponse.ok) {
 
 if (!paymentData.payment_session_id) {
 
-  throw new Error(
+  throw new Error(
 
-    "Payment session was not created."
+    "Payment session was not created."
 
-  );
+  );
 
 }
 
@@ -946,7 +852,7 @@ if (!paymentData.payment_session_id) {
 
 const cashfree = await load({
 
-  mode: "production",
+  mode: "production",
 
 });
 
@@ -954,11 +860,11 @@ const cashfree = await load({
 
 if (!cashfree) {
 
-  throw new Error(
+  throw new Error(
 
-    "Cashfree payment system could not be loaded."
+    "Cashfree payment system could not be loaded."
 
-  );
+  );
 
 }
 
@@ -966,9 +872,9 @@ if (!cashfree) {
 
 await cashfree.checkout({
 
-  paymentSessionId:
+  paymentSessionId:
 
-    paymentData.payment_session_id,
+    paymentData.payment_session_id,
 
 });
 
@@ -976,1492 +882,1345 @@ await cashfree.checkout({
 
 
 
-    } catch (error) {
+    } catch (error) {
 
 
 
-      console.error(
+      console.error(
 
-        "Failed to create order:",
+        "Failed to create order:",
 
-        error
+        error
 
-      );
+      );
 
 
 
 
 
-      setIsSubmitting(false);
+      setIsSubmitting(false);
 
 
 
 
 
-      const message =
+      const message =
 
-        error instanceof Error
+        error instanceof Error
 
-          ? error.message
+          ? error.message
 
-          : "We could not create your order.";
+          : "We could not create your order.";
 
 
 
 
 
-      alert(message);
+      alert(message);
 
 
 
-    }
+    }
 
 
 
-  };
+  };
 
 
 
 
 
-  // =========================================================
+  // =========================================================
 
-  // Empty Cart
+  // Empty Cart
 
-  // =========================================================
+  // =========================================================
 
 
 
-  if (cartItems.length === 0) {
+  if (cartItems.length === 0) {
 
 
 
-    return (
+    return (
 
 
 
-      <main className="min-h-screen bg-[#faf7f2] text-gray-900">
+      <main className="min-h-screen bg-[#faf7f2] text-gray-900">
 
 
 
 
 
-        {/* Header */}
+        {/* Header */}
 
 
 
-        <header className="border-b border-black/10 bg-[#faf7f2]">
+        <header className="border-b border-black/10 bg-[#faf7f2]">
 
 
 
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
 
 
 
-            <Link
+            <Link
 
-              href="/"
+              href="/"
 
-              className="group"
+              className="group"
 
-            >
+            >
 
 
 
-              <div className="font-serif text-2xl font-bold tracking-tight">
+              <div className="font-serif text-2xl font-bold tracking-tight">
 
-                BLR Seasonals
+                BLR Seasonals
 
-              </div>
+              </div>
 
 
 
-              <div className="mt-1 text-[10px] uppercase tracking-[0.25em] text-gray-500">
+              <div className="mt-1 text-[10px] uppercase tracking-[0.25em] text-gray-500">
 
-                Handcrafted · Est. 2024
+                Handcrafted · Est. 2024
 
-              </div>
+              </div>
 
 
 
-            </Link>
+            </Link>
 
 
 
 
 
-            <Link
+            <Link
 
-              href="/products"
+              href="/products"
 
-              className="text-sm font-medium text-gray-700 transition hover:text-black"
+              className="text-sm font-medium text-gray-700 transition hover:text-black"
 
-            >
+            >
 
-              ← Continue Shopping
+              ← Continue Shopping
 
-            </Link>
+            </Link>
 
 
 
-          </div>
+          </div>
 
 
 
-        </header>
+        </header>
 
 
 
 
 
-        {/* Empty Cart */}
+        {/* Empty Cart */}
 
 
 
-        <section className="mx-auto max-w-3xl px-6 py-20">
+        <section className="mx-auto max-w-3xl px-6 py-20">
 
 
 
-          <div className="rounded-3xl border border-black/10 bg-white px-6 py-20 text-center">
+          <div className="rounded-3xl border border-black/10 bg-white px-6 py-20 text-center">
 
 
 
-            <div className="text-5xl">
+            <div className="text-5xl">
 
-              🛒
+              🛒
 
-            </div>
+            </div>
 
 
 
 
 
-            <h1 className="mt-6 font-serif text-3xl font-bold">
+            <h1 className="mt-6 font-serif text-3xl font-bold">
 
-              Your Cart Is Empty
+              Your Cart Is Empty
 
-            </h1>
+            </h1>
 
 
 
 
 
-            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-gray-600">
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-gray-600">
 
-              Add some products to your cart before proceeding to checkout.
+              Add some products to your cart before proceeding to checkout.
 
-            </p>
+            </p>
 
 
 
 
 
-            <Link
+            <Link
 
-              href="/products"
+              href="/products"
 
-              className="mt-8 inline-block rounded-full bg-black px-8 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+              className="mt-8 inline-block rounded-full bg-black px-8 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
 
-            >
+            >
 
-              Browse Products
+              Browse Products
 
-            </Link>
+            </Link>
 
 
 
-          </div>
+          </div>
 
 
 
-        </section>
+        </section>
 
 
 
-      </main>
+      </main>
 
 
 
-    );
+    );
 
 
 
-  }
+  }
 
 
 
 
 
-  // =========================================================
+  // =========================================================
 
-  // Main Checkout Page
+  // Main Checkout Page
 
-  // =========================================================
+  // =========================================================
 
 
 
-  return (
+  return (
 
 
 
-    <main className="min-h-screen bg-[#faf7f2] text-gray-900">
+    <main className="min-h-screen bg-[#faf7f2] text-gray-900">
 
 
 
 
 
-      {/* =====================================================
+      {/* =====================================================
 
-          Header
+          Header
 
-      ===================================================== */}
+      ===================================================== */}
 
 
 
-      <header className="border-b border-black/10 bg-[#faf7f2]">
+      <header className="border-b border-black/10 bg-[#faf7f2]">
 
 
 
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
 
 
 
-          <Link
+          <Link
 
-            href="/"
+            href="/"
 
-            className="group"
+            className="group"
 
-          >
+          >
 
 
 
-            <div className="font-serif text-2xl font-bold tracking-tight">
+            <div className="font-serif text-2xl font-bold tracking-tight">
 
-              BLR Seasonals
+              BLR Seasonals
 
-            </div>
+            </div>
 
 
 
 
 
-            <div className="mt-1 text-[10px] uppercase tracking-[0.25em] text-gray-500">
+            <div className="mt-1 text-[10px] uppercase tracking-[0.25em] text-gray-500">
 
-              Handcrafted · Est. 2024
+              Handcrafted · Est. 2024
 
-            </div>
+            </div>
 
 
 
-          </Link>
+          </Link>
 
 
 
 
 
-          <Link
+          <Link
 
-            href="/cart"
+            href="/cart"
 
-            className="text-sm font-medium text-gray-700 transition hover:text-black"
+            className="text-sm font-medium text-gray-700 transition hover:text-black"
 
-          >
+          >
 
-            ← Back to Cart
+            ← Back to Cart
 
-          </Link>
+          </Link>
 
 
 
-        </div>
+        </div>
 
 
 
-      </header>
+      </header>
 
 
 
 
 
-      {/* =====================================================
+      {/* =====================================================
 
-          Heading
+          Heading
 
-      ===================================================== */}
+      ===================================================== */}
 
+      <section className="mx-auto max-w-6xl px-6 pt-3 pb-0 md:pt-3">
 
+        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-gray-500">
 
-      <section className="mx-auto max-w-6xl px-6 pb-8 pt-14 md:pt-16">
+          BLR Seasonals
 
+        </p>
 
 
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gray-500">
+        <h1 className="mt-2 font-serif text-4xl font-bold tracking-tight md:text-5xl">
 
-          BLR Seasonals
+          Checkout
 
-        </p>
+        </h1>
 
 
+        <p className="mt-2 max-w-2xl text-gray-600">
 
+          Enter your delivery details to continue with your order.
 
+        </p>
 
-        <h1 className="mt-4 font-serif text-4xl font-bold tracking-tight md:text-5xl">
 
-          Checkout
 
-        </h1>
+      </section>
 
 
+      {/* =====================================================
 
+          Checkout Section
 
+      ===================================================== */}
 
-        <p className="mt-3 max-w-2xl text-gray-600">
 
-          Enter your delivery details to continue with your order.
 
-        </p>
+      <section className="mx-auto max-w-6xl px-4 pt-4 pb-4 md:px-6 md:pt-5 md:pb-6">
 
 
 
-      </section>
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_380px] lg:gap-8">
 
 
 
 
 
-      {/* =====================================================
+          {/* =================================================
 
-          Checkout Section
+              Customer Details
 
-      ===================================================== */}
+          ================================================= */}
 
 
+         <form
+  onSubmit={handleSubmit}
+  className="w-full self-start rounded-2xl border border-black/10 bg-white p-5 md:p-6"
+>
 
-      <section className="mx-auto max-w-6xl px-6 pb-20">
+            <h2 className="font-serif text-2xl font-bold">
 
+              Delivery Details
 
+            </h2>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
 
+            <p className="mt-2 text-sm text-gray-500">
 
+              Please provide the information needed to deliver your order.
 
+            </p>
 
 
-          {/* =================================================
 
-              Customer Details
+            {/* =================================================
 
-          ================================================= */}
+                Name
 
+            ================================================= */}
 
 
-          <form
 
-            onSubmit={handleSubmit}
+            <div className="mt-5">
 
-            className="rounded-2xl border border-black/10 bg-white p-6 md:p-8"
+              <label
 
-          >
+                htmlFor="name"
 
+                className="mb-2 block text-sm font-semibold"
 
+              >
 
-            <h2 className="font-serif text-2xl font-bold">
+                Full Name
 
-              Delivery Details
+              </label>
 
-            </h2>
 
+              <input
 
+                id="name"
 
+                name="name"
 
+                type="text"
 
-            <p className="mt-2 text-sm text-gray-500">
+                value={form.name}
 
-              Please provide the information needed to deliver your order.
+                onChange={handleChange}
 
-            </p>
+                required
 
+                autoComplete="name"
 
+                placeholder="Enter your full name"
 
+                className={`h-12 w-full rounded-xl border bg-white px-4 text-sm outline-none transition focus:border-black ${
 
+                  errors.name
 
-            {/* =================================================
+                    ? "border-red-500"
 
-                Name
+                    : "border-black/15"
 
-            ================================================= */}
+                }`}
 
+              />
 
+              {errors.name && (
 
-            <div className="mt-8">
 
 
+                <p className="mt-2 text-xs text-red-600">
 
-              <label
+                  {errors.name}
 
-                htmlFor="name"
+                </p>
 
-                className="mb-2 block text-sm font-semibold"
 
-              >
 
-                Full Name
+              )}
 
-              </label>
 
 
+            </div>
 
 
 
-              <input
 
-                id="name"
 
-                name="name"
+            {/* =================================================
 
-                type="text"
+                Phone + Email
 
-                value={form.name}
+            ================================================= */}
 
-                onChange={handleChange}
 
-                required
 
-                autoComplete="name"
+            <div className="mt-5 flex flex-col gap-5 md:flex-row">
 
-                placeholder="Enter your full name"
 
-                className={`h-12 w-full rounded-xl border bg-white px-4 text-sm outline-none transition focus:border-black ${
+              {/* Phone */}
 
-                  errors.name
 
-                    ? "border-red-500"
 
-                    : "border-black/15"
+              <div className="w-full">
 
-                }`}
 
-              />
 
+                <label
 
+                  htmlFor="phone"
 
+                  className="mb-2 block text-sm font-semibold"
 
+                >
 
-              {errors.name && (
+                  Mobile Number
 
+                </label>
 
 
-                <p className="mt-2 text-xs text-red-600">
 
-                  {errors.name}
 
-                </p>
 
+                <input
 
+                  id="phone"
 
-              )}
+                  name="phone"
 
+                  type="tel"
 
+                  value={form.phone}
 
-            </div>
+                  onChange={handleChange}
 
+                  required
 
+                  autoComplete="tel"
 
+                  inputMode="numeric"
 
+                  maxLength={10}
 
-            {/* =================================================
+                  placeholder="10-digit mobile number"
 
-                Phone + Email
+                  className={`h-12 w-full rounded-xl border bg-white px-4 text-sm outline-none transition focus:border-black ${
 
-            ================================================= */}
+                    errors.phone
 
+                      ? "border-red-500"
 
+                      : "border-black/15"
 
-            <div className="mt-5 grid gap-5 md:grid-cols-2">
+                  }`}
 
+                />
 
 
 
 
-              {/* Phone */}
 
+                {errors.phone && (
 
 
-              <div>
 
+                  <p className="mt-2 text-xs text-red-600">
 
+                    {errors.phone}
 
-                <label
+                  </p>
 
-                  htmlFor="phone"
 
-                  className="mb-2 block text-sm font-semibold"
 
-                >
+                )}
 
-                  Mobile Number
 
-                </label>
 
+              </div>
 
 
 
 
-                <input
 
-                  id="phone"
+              {/* Email */}
 
-                  name="phone"
 
-                  type="tel"
 
-                  value={form.phone}
+              <div className="w-full">
 
-                  onChange={handleChange}
 
-                  required
 
-                  autoComplete="tel"
+                <label
 
-                  inputMode="numeric"
+                  htmlFor="email"
 
-                  maxLength={10}
+                  className="mb-2 block text-sm font-semibold"
 
-                  placeholder="10-digit mobile number"
+                >
 
-                  className={`h-12 w-full rounded-xl border bg-white px-4 text-sm outline-none transition focus:border-black ${
+                  Email Address
 
-                    errors.phone
+                </label>
 
-                      ? "border-red-500"
 
-                      : "border-black/15"
 
-                  }`}
 
-                />
 
+                <input
 
+                  id="email"
 
+                  name="email"
 
+                  type="email"
 
-                {errors.phone && (
+                  value={form.email}
 
+                  onChange={handleChange}
 
+                  required
 
-                  <p className="mt-2 text-xs text-red-600">
+                  autoComplete="email"
 
-                    {errors.phone}
+                  placeholder="you\@example.com"
 
-                  </p>
+                  className={`h-12 w-full rounded-xl border bg-white px-4 text-sm outline-none transition focus:border-black ${
 
+                    errors.email
 
+                      ? "border-red-500"
 
-                )}
+                      : "border-black/15"
 
+                  }`}
 
+                />
 
-              </div>
 
 
 
 
+                {errors.email && (
 
-              {/* Email */}
 
 
+                  <p className="mt-2 text-xs text-red-600">
 
-              <div>
+                    {errors.email}
 
+                  </p>
 
 
-                <label
 
-                  htmlFor="email"
+                )}
 
-                  className="mb-2 block text-sm font-semibold"
 
-                >
 
-                  Email Address
+              </div>
 
-                </label>
 
 
+            </div>
 
 
 
-                <input
 
-                  id="email"
 
-                  name="email"
+            {/* =================================================
 
-                  type="email"
+                Address
 
-                  value={form.email}
+            ================================================= */}
 
-                  onChange={handleChange}
 
-                  required
 
-                  autoComplete="email"
+            <div className="mt-5">
 
-                  placeholder="you\@example.com"
 
-                  className={`h-12 w-full rounded-xl border bg-white px-4 text-sm outline-none transition focus:border-black ${
 
-                    errors.email
+              <label
 
-                      ? "border-red-500"
+                htmlFor="address"
 
-                      : "border-black/15"
+                className="mb-2 block text-sm font-semibold"
 
-                  }`}
+              >
 
-                />
+                Delivery Address
 
+              </label>
 
 
 
 
-                {errors.email && (
 
+              <textarea
 
+                id="address"
 
-                  <p className="mt-2 text-xs text-red-600">
+                name="address"
 
-                    {errors.email}
+                value={form.address}
 
-                  </p>
+                onChange={handleChange}
 
+                required
 
+                autoComplete="street-address"
 
-                )}
+                rows={4}
 
+                placeholder="House / Flat number, street, area..."
 
+                className={`w-full resize-none rounded-xl border bg-white px-4 py-3 text-sm outline-none transition focus:border-black ${
 
-              </div>
+                  errors.address
 
+                    ? "border-red-500"
 
+                    : "border-black/15"
 
-            </div>
+                }`}
 
+              />
 
 
 
 
-            {/* =================================================
 
-                Address
+              {errors.address && (
 
-            ================================================= */}
 
 
+                <p className="mt-2 text-xs text-red-600">
 
-            <div className="mt-5">
+                  {errors.address}
 
+                </p>
 
 
-              <label
 
-                htmlFor="address"
+              )}
 
-                className="mb-2 block text-sm font-semibold"
 
-              >
 
-                Delivery Address
+            </div>
 
-              </label>
 
 
 
 
+            {/* =================================================
 
-              <textarea
+                City / State / PIN
 
-                id="address"
+            ================================================= */}
 
-                name="address"
 
-                value={form.address}
 
-                onChange={handleChange}
+            <div className="mt-5 flex flex-col gap-5 md:flex-row">
 
-                required
 
-                autoComplete="street-address"
 
-                rows={4}
 
-                placeholder="House / Flat number, street, area..."
 
-                className={`w-full resize-none rounded-xl border bg-white px-4 py-3 text-sm outline-none transition focus:border-black ${
+              {/* City */}
 
-                  errors.address
 
-                    ? "border-red-500"
 
-                    : "border-black/15"
+              <div>
 
-                }`}
 
-              />
 
+                <label
 
+                  htmlFor="city"
 
+                  className="mb-2 block text-sm font-semibold"
 
+                >
 
-              {errors.address && (
+                  City
 
+                </label>
 
 
-                <p className="mt-2 text-xs text-red-600">
 
-                  {errors.address}
 
-                </p>
 
+                <input
 
+                  id="city"
 
-              )}
+                  name="city"
 
+                  type="text"
 
+                  value={form.city}
 
-            </div>
+                  onChange={handleChange}
 
+                  required
 
+                  autoComplete="address-level2"
 
+                  placeholder="City"
 
+                  className={`h-12 w-full rounded-xl border bg-white px-4 text-sm outline-none transition focus:border-black ${
 
-            {/* =================================================
+                    errors.city
 
-                City / State / PIN
+                      ? "border-red-500"
 
-            ================================================= */}
+                      : "border-black/15"
 
+                  }`}
 
+                />
 
-            <div className="mt-5 grid gap-5 md:grid-cols-3">
 
 
 
 
+                {errors.city && (
 
-              {/* City */}
 
 
+                  <p className="mt-2 text-xs text-red-600">
 
-              <div>
+                    {errors.city}
 
+                  </p>
 
 
-                <label
 
-                  htmlFor="city"
+                )}
 
-                  className="mb-2 block text-sm font-semibold"
 
-                >
 
-                  City
+              </div>
 
-                </label>
 
 
 
 
+              {/* State */}
 
-                <input
 
-                  id="city"
 
-                  name="city"
+              <div>
 
-                  type="text"
 
-                  value={form.city}
 
-                  onChange={handleChange}
+                <label
 
-                  required
+                  htmlFor="state"
 
-                  autoComplete="address-level2"
+                  className="mb-2 block text-sm font-semibold"
 
-                  placeholder="City"
+                >
 
-                  className={`h-12 w-full rounded-xl border bg-white px-4 text-sm outline-none transition focus:border-black ${
+                  State
 
-                    errors.city
+                </label>
 
-                      ? "border-red-500"
 
-                      : "border-black/15"
 
-                  }`}
 
-                />
 
+                <input
 
+                  id="state"
 
+                  name="state"
 
+                  type="text"
 
-                {errors.city && (
+                  value={form.state}
 
+                  onChange={handleChange}
 
+                  required
 
-                  <p className="mt-2 text-xs text-red-600">
+                  autoComplete="address-level1"
 
-                    {errors.city}
+                  placeholder="State"
 
-                  </p>
+                  className={`h-12 w-full rounded-xl border bg-white px-4 text-sm outline-none transition focus:border-black ${
 
+                    errors.state
 
+                      ? "border-red-500"
 
-                )}
+                      : "border-black/15"
 
+                  }`}
 
+                />
 
-              </div>
 
 
 
 
+                {errors.state && (
 
-              {/* State */}
 
 
+                  <p className="mt-2 text-xs text-red-600">
 
-              <div>
+                    {errors.state}
 
+                  </p>
 
 
-                <label
 
-                  htmlFor="state"
+                )}
 
-                  className="mb-2 block text-sm font-semibold"
 
-                >
 
-                  State
+              </div>
 
-                </label>
 
 
 
 
+              {/* PIN */}
 
-                <input
 
-                  id="state"
 
-                  name="state"
+              <div>
 
-                  type="text"
 
-                  value={form.state}
 
-                  onChange={handleChange}
+                <label
 
-                  required
+                  htmlFor="pincode"
 
-                  autoComplete="address-level1"
+                  className="mb-2 block text-sm font-semibold"
 
-                  placeholder="State"
+                >
 
-                  className={`h-12 w-full rounded-xl border bg-white px-4 text-sm outline-none transition focus:border-black ${
+                  PIN Code
 
-                    errors.state
+                </label>
 
-                      ? "border-red-500"
+                <input
 
-                      : "border-black/15"
+                  id="pincode"
 
-                  }`}
+                  name="pincode"
 
-                />
+                  type="text"
 
+                  inputMode="numeric"
 
+                  value={form.pincode}
 
+                  onChange={handleChange}
 
+                  required
 
-                {errors.state && (
+                  autoComplete="postal-code"
 
+                  maxLength={6}
 
+                  placeholder="560001"
 
-                  <p className="mt-2 text-xs text-red-600">
+                  className={`h-12 w-full rounded-xl border bg-white px-4 text-sm outline-none transition focus:border-black ${
 
-                    {errors.state}
+                    errors.pincode
 
-                  </p>
+                      ? "border-red-500"
 
+                      : "border-black/15"
 
+                  }`}
 
-                )}
+                />
 
 
+                {errors.pincode && (
 
-              </div>
 
 
+                  <p className="mt-2 text-xs text-red-600">
 
+                    {errors.pincode}
 
+                  </p>
 
-              {/* PIN */}
 
 
+                )}
 
-              <div>
 
 
+              </div>
 
-                <label
 
-                  htmlFor="pincode"
 
-                  className="mb-2 block text-sm font-semibold"
+            </div>
 
-                >
 
-                  PIN Code
 
-                </label>
+            {/* =================================================
 
+                Submit
 
+            ================================================= */}
 
 
+            <button
 
-                <input
+              type="submit"
 
-                  id="pincode"
+              disabled={isSubmitting}
 
-                  name="pincode"
+              className="mt-8 w-full rounded-xl bg-black px-6 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
 
-                  type="text"
+            >
 
-                  inputMode="numeric"
+              {isSubmitting
 
-                  value={form.pincode}
+  ? "Opening Payment..."
 
-                  onChange={handleChange}
+  : "Continue to Payment"}
 
-                  required
 
-                  autoComplete="postal-code"
 
-                  maxLength={6}
+            </button>
 
-                  placeholder="560001"
+            <p className="mt-4 text-center text-xs leading-5 text-gray-500">
 
-                  className={`h-12 w-full rounded-xl border bg-white px-4 text-sm outline-none transition focus:border-black ${
-
-                    errors.pincode
-
-                      ? "border-red-500"
-
-                      : "border-black/15"
-
-                  }`}
-
-                />
-
-
-
-
-
-                {errors.pincode && (
-
-
-
-                  <p className="mt-2 text-xs text-red-600">
-
-                    {errors.pincode}
-
-                  </p>
-
-
-
-                )}
-
-
-
-              </div>
-
-
-
-            </div>
-
-
-
-
-
-            {/* =================================================
-
-                Submit
-
-            ================================================= */}
-
-
-
-            <button
-
-              type="submit"
-
-              disabled={isSubmitting}
-
-              className="mt-8 w-full rounded-xl bg-black px-6 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
-
-            >
-
-
-
-              {isSubmitting
-
-  ? "Opening Payment..."
-
-  : "Continue to Payment"}
-
-
-
-            </button>
-
-
-
-
-
-            <p className="mt-4 text-center text-xs leading-5 text-gray-500">
-
-  You will be securely redirected to Cashfree to complete your payment.
+  You will be securely redirected to Cashfree to complete your payment.
 
 </p>
 
+          </form>
 
 
-          </form>
+          {/* =================================================
 
+              Order Summary
 
+          ================================================= */}
 
+          <aside className="h-fit rounded-2xl border border-black/10 bg-white p-5 lg:sticky lg:top-6 lg:col-start-2 lg:row-start-1 lg:self-start">
 
+            <h2 className="font-serif text-2xl font-bold">
 
-          {/* =================================================
+              Order Summary
 
-              Order Summary
+            </h2>
 
-          ================================================= */}
 
+            {/* =================================================
 
+                Products
 
-          <aside className="h-fit rounded-2xl border border-black/10 bg-white p-6 lg:sticky lg:top-6">
+            ================================================= */}
 
+            <div className="mt-6 space-y-4">
+  {cartItems.map((item) => {
+    const product = item.product;
+    const itemTotal = product.price * item.quantity;
 
+    return (
+      <div
+        key={product.id}
+        className="rounded-2xl border border-black/10 bg-stone-50 p-4"
+      >
+        <div className="flex gap-4">
+          {/* Product Image */}
+          <div className="h-28 w-28 shrink-0 overflow-hidden rounded-xl bg-white border border-black/5">
+            <img
+              src={product.images[0]}
+              alt={product.name}
+              className="h-full w-full object-contain p-2"
+            />
+          </div>
 
-            <h2 className="font-serif text-2xl font-bold">
+          {/* Product Information */}
+          <div className="flex min-w-0 flex-1 flex-col justify-between py-1">
+            <div>
+              <p className="text-base font-semibold leading-6 text-gray-900">
+                {product.name}
+              </p>
 
-              Order Summary
+              <p className="mt-2 text-sm text-gray-500">
+                Quantity: {item.quantity}
+              </p>
+            </div>
 
-            </h2>
+            <p className="mt-4 text-base font-semibold text-gray-900">
+              {formatPrice(itemTotal)}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  })}
+</div>
 
 
+            {/* =================================================
 
+                Totals
 
+            ================================================= */}
 
-            {/* =================================================
 
-                Products
 
-            ================================================= */}
+            <div className="mt-6 space-y-4 border-b border-black/10 pb-6">
 
 
 
-            <div className="mt-6 space-y-4">
 
 
+              {/* Subtotal */}
 
-              {cartItems.map((item) => {
 
 
+              <div className="flex items-center justify-between text-sm">
 
-                const product =
 
-                  item.product;
 
+                <span className="text-gray-600">
 
+                  Subtotal
 
-                const itemTotal =
+                </span>
 
-                  product.price *
 
-                  item.quantity;
 
 
 
+                <span className="font-semibold">
 
+                  {formatPrice(cartSubtotal)}
 
-                return (
+                </span>
 
 
 
-                  <div
+              </div>
 
-                    key={product.id}
 
-                    className="flex gap-4 border-b border-black/10 pb-4"
 
-                  >
 
 
+              {/* Shipping */}
 
 
 
-                    {/* Product Image */}
+              <div className="flex items-center justify-between text-sm">
 
 
 
-                    <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-stone-100">
+                <span className="text-gray-600">
 
+                  Shipping
 
+                </span>
 
-                      <img
 
-                        src={product.images[0]}
 
-                        alt={product.name}
 
-                        className="h-full w-full object-contain p-2"
 
-                      />
+                {shippingCost === 0 ? (
 
 
 
-                    </div>
+                  <span className="font-semibold text-green-700">
 
+                    FREE
 
+                  </span>
 
 
 
-                    {/* Product Information */}
+                ) : (
 
 
 
-                    <div className="min-w-0 flex-1">
+                  <span className="font-semibold">
 
+                    {formatPrice(shippingCost)}
 
+                  </span>
 
-                      <p className="text-sm font-semibold">
 
-                        {product.name}
 
-                      </p>
+                )}
 
 
 
+              </div>
 
 
-                      <p className="mt-1 text-xs text-gray-500">
 
-                        Quantity: {item.quantity}
+            </div>
+            {shippingCost === 0 && (
 
-                      </p>
 
 
+              <div className="mt-5 rounded-xl bg-green-50 p-4">
 
 
 
-                      <p className="mt-2 text-sm font-semibold">
+                <p className="text-xs font-semibold text-green-700">
 
-                        {formatPrice(itemTotal)}
+                  🎉 You qualify for FREE shipping!
 
-                      </p>
+                </p>
 
 
 
-                    </div>
+              </div>
 
 
 
-                  </div>
+            )}
 
 
 
-                );
 
 
+            {/* =================================================
 
-              })}
+                Total
 
+            ================================================= */}
 
 
-            </div>
 
+            <div className="mt-6 flex items-center justify-between">
 
 
 
+              <span className="font-semibold">
 
-            {/* =================================================
+                Total
 
-                Totals
+              </span>
 
-            ================================================= */}
 
 
 
-            <div className="mt-6 space-y-4 border-b border-black/10 pb-6">
 
+              <span className="text-2xl font-bold">
 
+                {formatPrice(orderTotal)}
 
+              </span>
 
 
-              {/* Subtotal */}
 
+            </div>
 
 
-              <div className="flex items-center justify-between text-sm">
 
 
 
-                <span className="text-gray-600">
+            {/* =================================================
 
-                  Subtotal
+                Security
 
-                </span>
+            ================================================= */}
 
 
 
+            <div className="mt-7 rounded-xl bg-[#faf7f2] p-4">
 
 
-                <span className="font-semibold">
 
-                  {formatPrice(cartSubtotal)}
+              <p className="text-sm font-semibold">
 
-                </span>
+                Secure Checkout
 
+              </p>
 
 
-              </div>
 
 
 
+              <p className="mt-1 text-xs leading-5 text-gray-500">
 
+                Your order details will be handled securely. Payment
 
-              {/* Shipping */}
+                processing will be connected before production launch.
 
+              </p>
 
 
-              <div className="flex items-center justify-between text-sm">
 
+            </div>
 
 
-                <span className="text-gray-600">
 
-                  Shipping
+          </aside>
 
-                </span>
 
 
+        </div>
 
 
 
-                {shippingCost === 0 ? (
+      </section>
 
 
 
-                  <span className="font-semibold text-green-700">
 
-                    FREE
 
-                  </span>
+      {/* =====================================================
 
+          Footer
 
+      ===================================================== */}
 
-                ) : (
 
 
+      <footer className="border-t border-black/10 bg-white">
 
-                  <span className="font-semibold">
 
-                    {formatPrice(shippingCost)}
 
-                  </span>
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-8 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
 
 
 
-                )}
+          <p>
 
+            © {new Date().getFullYear()} BLR Seasonals. All rights reserved.
 
+          </p>
 
-              </div>
 
 
 
-            </div>
-            {shippingCost === 0 && (
 
+          <Link
 
+            href="/products"
 
-              <div className="mt-5 rounded-xl bg-green-50 p-4">
+            className="transition hover:text-black"
 
+          >
 
+            Continue Shopping
 
-                <p className="text-xs font-semibold text-green-700">
+          </Link>
 
-                  🎉 You qualify for FREE shipping!
 
-                </p>
 
+        </div>
 
 
-              </div>
 
+      </footer>
 
 
-            )}
 
+    </main>
 
 
 
-
-            {/* =================================================
-
-                Total
-
-            ================================================= */}
-
-
-
-            <div className="mt-6 flex items-center justify-between">
-
-
-
-              <span className="font-semibold">
-
-                Total
-
-              </span>
-
-
-
-
-
-              <span className="text-2xl font-bold">
-
-                {formatPrice(orderTotal)}
-
-              </span>
-
-
-
-            </div>
-
-
-
-
-
-            {/* =================================================
-
-                Security
-
-            ================================================= */}
-
-
-
-            <div className="mt-7 rounded-xl bg-[#faf7f2] p-4">
-
-
-
-              <p className="text-sm font-semibold">
-
-                Secure Checkout
-
-              </p>
-
-
-
-
-
-              <p className="mt-1 text-xs leading-5 text-gray-500">
-
-                Your order details will be handled securely. Payment
-
-                processing will be connected before production launch.
-
-              </p>
-
-
-
-            </div>
-
-
-
-          </aside>
-
-
-
-        </div>
-
-
-
-      </section>
-
-
-
-
-
-      {/* =====================================================
-
-          Footer
-
-      ===================================================== */}
-
-
-
-      <footer className="border-t border-black/10 bg-white">
-
-
-
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-8 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
-
-
-
-          <p>
-
-            © {new Date().getFullYear()} BLR Seasonals. All rights reserved.
-
-          </p>
-
-
-
-
-
-          <Link
-
-            href="/products"
-
-            className="transition hover:text-black"
-
-          >
-
-            Continue Shopping
-
-          </Link>
-
-
-
-        </div>
-
-
-
-      </footer>
-
-
-
-    </main>
-
-
-
-  );
+  );
 
 
 
