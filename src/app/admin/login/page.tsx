@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -106,12 +107,12 @@ export default function AdminLoginPage() {
           </form>
 
           <div className="mt-8 text-center">
-            <a
-              href="/"
-              className="text-sm text-stone-500 hover:text-stone-900 transition"
-            >
-              ← Back to BLR Seasonals
-            </a>
+            <Link
+  href="/"
+  className="text-sm text-stone-500 hover:text-stone-900 transition"
+>
+  ← Back to BLR Seasonals
+</Link>
           </div>
         </div>
       </div>

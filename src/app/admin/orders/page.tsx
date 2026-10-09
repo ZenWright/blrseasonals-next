@@ -21,6 +21,9 @@ type Order = {
   payment_status: string;
   payment_gateway: string | null;
   payment_id: string | null;
+  ekart_tracking_id: string | null;
+  ekart_status: string | null;
+  ekart_created_at: string | null;
   item_count: number;
   created_at: string | null;
 };
@@ -55,7 +58,7 @@ export default function AdminOrdersPage() {
           setLoading(true);
           setError("");
 
-          const token = await user.getIdToken();
+          const token = await user.getIdToken(true);
 
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/admin/orders`,
@@ -399,6 +402,21 @@ export default function AdminOrdersPage() {
                         <p className="mt-1 text-xs text-stone-500">
                           Order ID: {order.id}
                         </p>
+                                               {order.ekart_tracking_id && (
+                          <div className="mt-2 text-xs">
+                            <p className="font-semibold text-stone-700">
+                              Ekart Tracking
+                            </p>
+
+                            <p className="mt-1 break-all text-stone-500">
+                              {order.ekart_tracking_id}
+                            </p>
+
+                                        <p className="mt-1 break-all text-stone-500">
+              Status: {order.ekart_status || "Unavailable"}
+            </p>
+                          </div>
+                        )}
 
                       </td>
 

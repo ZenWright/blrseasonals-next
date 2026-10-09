@@ -14,7 +14,7 @@ type OrderItem = {
 };
 
 type Order = {
-  orderId: string;
+  order_id: string;
 
   customer: {
     name: string;
@@ -34,6 +34,10 @@ type Order = {
 
   status: string;
   payment_status: string;
+
+  ekart_tracking_id: string | null;
+  ekart_status: boolean | string | null;
+  ekart_created_at: string | null;
 
   createdAt: string | null;
 };
@@ -340,7 +344,7 @@ function OrderConfirmationContent() {
 
 
             <p className="mt-2 break-all text-xl font-bold tracking-wide">
-              {order.orderId}
+              {order.order_id}
             </p>
 
           </div>
@@ -591,7 +595,49 @@ function OrderConfirmationContent() {
 
         </div>
 
+                {/* ===================================================
+            Shipment Tracking
+        =================================================== */}
 
+        {order.ekart_tracking_id && (
+          <div className="mt-8 rounded-2xl border border-black/10 bg-white p-6">
+            <h2 className="font-serif text-xl font-bold">
+              Shipment Tracking
+            </h2>
+
+            <div className="mt-5 space-y-3 text-sm">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-gray-600">
+                  Courier
+                </span>
+
+                <span className="font-semibold">
+                  Ekart Logistics
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-gray-600">
+                  Tracking ID
+                </span>
+
+                <span className="break-all font-semibold">
+                  {order.ekart_tracking_id}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-gray-600">
+                  Shipment Status
+                </span>
+
+                <span className="font-semibold text-green-700">
+                  Shipment Created
+                </span>
+              </div>
+            </div>
+          </div>
+    )}
         {/* ===================================================
             Actions
         =================================================== */}

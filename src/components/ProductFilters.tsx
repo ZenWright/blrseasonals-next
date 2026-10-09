@@ -68,12 +68,16 @@ export default function ProductFilters({
   // =========================================================
 
     useEffect(() => {
+  const timer = setTimeout(() => {
     const categoryFromUrl = searchParams.get("category");
     const collectionFromUrl = searchParams.get("collection");
 
     setCategory(categoryFromUrl || "All");
     setCollection(collectionFromUrl || "All");
-  }, [searchParams]);
+  }, 0);
+
+  return () => clearTimeout(timer);
+}, [searchParams]);
 
   // =========================================================
   // Category Names

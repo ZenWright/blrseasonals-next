@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -76,19 +76,19 @@ export default function AdminSeasonalCollectionsPage() {
   // Get Firebase ID token
   // ---------------------------------------------------------
 
-  async function getAdminToken() {
+  const getAdminToken = useCallback(async () => {
     if (!user) {
       throw new Error("Admin user is not authenticated.");
     }
 
     return await user.getIdToken(true);
-  }
+  }, [user]);
 
   // ---------------------------------------------------------
   // Load seasonal collections
   // ---------------------------------------------------------
 
-  async function loadCollections() {
+  const loadCollections = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -126,13 +126,17 @@ export default function AdminSeasonalCollectionsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [getAdminToken]);
 
   useEffect(() => {
-    if (user) {
-      loadCollections();
-    }
-  }, [user]);
+    if (!user) return;
+
+    const timer = setTimeout(() => {
+      void loadCollections();
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [user, loadCollections]);
 
   // ---------------------------------------------------------
   // Add new collection

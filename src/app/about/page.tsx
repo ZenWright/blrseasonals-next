@@ -267,7 +267,7 @@ export default function AboutPage() {
       </h2>
 
       <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-stone-600">
-        8/2, Mary's Layout, 1st Cross St, Nagawara Main Rd,
+        8/2, Mary&apos;s Layout, 1st Cross St, Nagawara Main Rd,
         Nagawara, Bengaluru, Karnataka – 560045
       </p>
 

@@ -58,7 +58,9 @@ export function CartProvider({
       if (savedCart) {
         const parsedCart = JSON.parse(savedCart);
 
-        if (Array.isArray(parsedCart)) {
+          if (Array.isArray(parsedCart)) {
+          // Restore browser-persisted cart after mount to avoid hydration mismatches.
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setCartItems(parsedCart);
         }
       }
@@ -171,7 +173,7 @@ export function CartProvider({
     };
 
     syncCartWithDatabase();
-  }, [isLoaded]);
+  }, [isLoaded, cartItems.length]);
 
   // --------------------------------------------------
   // 3. Save cart

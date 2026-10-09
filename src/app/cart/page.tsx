@@ -74,7 +74,7 @@ export default function CartPage() {
             </h2>
 
             <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-gray-600">
-              You haven't added anything to your cart yet.
+              You haven&apos;t added anything to your cart yet.
               Explore our collection and find something special.
             </p>
 
